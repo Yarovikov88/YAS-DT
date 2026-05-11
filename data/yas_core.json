@@ -1,0 +1,27 @@
+{
+  "system_info": {
+    "name": "YAS Digital Twin",
+    "version": "2.0",
+    "architect": "Yarovikov"
+  },
+  "knowledge_base": [
+    {
+      "id": 1,
+      "title": "Урок Шмидта",
+      "content": "Отделяй формальный баг от системного провала. Ошибка — данные, а не приговор.",
+      "tags": ["army", "management", "errors"]
+    },
+    {
+      "id": 189,
+      "title": "Data Ownership",
+      "content": "Владение исходным кодом жизни. Офлайн-хранение и независимость от облаков.",
+      "tags": ["autonomy", "security"]
+    },
+    {
+      "id": 200,
+      "title": "Завершение цикла",
+      "content": "Любое действие должно иметь логическое завершение: Commit или Hard Close.",
+      "tags": ["productivity", "logic"]
+    }
+  ]
+}
