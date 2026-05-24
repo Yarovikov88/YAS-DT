@@ -3,11 +3,13 @@
 ---
 
 ---
+
 title: "Архитектурная концепция и техническое задание: YAS.hpi.expert"
 author: "А. Яровиков"
 version: "2.0"
 date: "2026-05-24"
 status: "approved"
+
 ---
 
 ## Проект: Персональный Семантический Граф Знаний и Цифровой Двойник Лидера
@@ -125,11 +127,27 @@ CREATE INDEX idx_relations_target ON fact_relations(target_id);
 ```json
 {
   "nodes": [
-    { "id": 1, "label": "Наследие Строителей", "category": "Психофизика", "weight": 0.9 },
-    { "id": 204, "label": "Гештальт Архитектуры", "category": "Расширение системы", "weight": 0.9 }
+    {
+      "id": 1,
+      "label": "Наследие Строителей",
+      "category": "Психофизика",
+      "weight": 0.9
+    },
+    {
+      "id": 204,
+      "label": "Гештальт Архитектуры",
+      "category": "Расширение системы",
+      "weight": 0.9
+    }
   ],
   "edges": [
-    { "id": 1024, "source": 204, "target": 1, "type": "STRENGTHENS", "weight": 0.95 }
+    {
+      "id": 1024,
+      "source": 204,
+      "target": 1,
+      "type": "STRENGTHENS",
+      "weight": 0.95
+    }
   ]
 }
 ```
@@ -170,7 +188,7 @@ CREATE INDEX idx_relations_target ON fact_relations(target_id);
     {
       "target_id": 1,
       "relation_type": "STRENGTHENS",
-      "relation_strength": 0.90,
+      "relation_strength": 0.9,
       "description": "Эстетика физических форм напрямую усиливает и расширяет базовый BIOS Наследия Строителей."
     },
     {
