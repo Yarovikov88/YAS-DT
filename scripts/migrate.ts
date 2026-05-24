@@ -87,6 +87,8 @@ async function runMigration() {
       content: fact.content,
       category_id: catMap.get(fact.category.trim().toLowerCase()) || 1,
       section_id: secMap.get(fact.section.trim().toLowerCase()) || 1,
+      original_category: fact.category,
+      original_section: fact.section,
       weight: fact.weight || 0.70,
       relations: updatedRelations,
       created_at: fact.created_at ? new Date(fact.created_at).toISOString() : new Date().toISOString()
@@ -95,24 +97,71 @@ async function runMigration() {
 
   // 5. Чистая заливка
   console.log("⚡️ Заливка нормализованной матрицы смыслов...");
-  const { data, error } = await supabase.from('facts').insert(finalFacts).select();
+  let data: any = null;
+  let error: any = null;
+
+  try {
+    const res = await supabase.from('facts').insert(finalFacts).select();
+    data = res.data;
+    error = res.error;
+  } catch (e: any) {
+    error = e;
+  }
 
   if (error) {
-    console.error("💥 Ошибка импорта:", error.message);
+    console.error("💥 Ошибка импорта при вставке с category_id/section_id:", error.message || error);
+    // Попытка fallback: вставить как plain category/section (строки), если в БД нет колонок category_id/section_id
+    try {
+      const fallback = finalFacts.map(f => ({
+        title: f.title,
+        content: f.content,
+        category: (f as any).original_category || 'uncategorized',
+        section: (f as any).original_section || 'default',
+        weight: f.weight,
+        created_at: f.created_at
+      }));
+
+      const res2 = await supabase.from('facts').insert(fallback).select();
+      data = res2.data;
+      error = res2.error;
+      if (error) {
+        console.error('💥 Ошибка импорта при fallback вставке:', error.message || error);
+      } else {
+        console.log('✅ Fallback вставка facts выполнена успешно (category/section).');
+      }
+    } catch (e: any) {
+      console.error('💥 Исключение при fallback вставке:', e.message || e);
+    }
   } else {
     console.log(`\n🏆 МАГИСТЕРСКИЙ ТРИУМФ: Схема нормализована до 3NF!`);
     console.log(`📊 Залито чистых строк: ${data.length} (номера с 1 по ${data.length})`);
+  }
+
+  // 6. Подготовка и заливка ребер графа (fact_relations)
+  if (data && data.length > 0) {
     console.log(`🔗 Подготавливаю вставку relations в таблицу fact_relations...`);
 
-    // 6. Подготовка и заливка ребер графа (fact_relations)
+    // Построим мапы для соответствия локальных newId -> заголовок -> реальный id в БД
+    const titleToInsertedId = new Map<string, number>();
+    (data as any[]).forEach((row: any) => {
+      if (row.title) titleToInsertedId.set(row.title, row.id);
+    });
+
+    const newIdToTitle = new Map<number, string>();
+    finalFacts.forEach(f => {
+      newIdToTitle.set(f.id, f.title);
+    });
+
     const relationRows: Array<any> = [];
     finalFacts.forEach(f => {
-      const srcId = f.id;
+      const srcActual = titleToInsertedId.get(f.title) || f.id;
       const strengthDefault = typeof f.weight === 'number' ? f.weight : 1.0;
       (f.relations || []).forEach((tId: number) => {
+        const targetTitle = newIdToTitle.get(tId);
+        const tgtActual = targetTitle ? (titleToInsertedId.get(targetTitle) || tId) : tId;
         relationRows.push({
-          source_id: srcId,
-          target_id: tId,
+          source_id: srcActual,
+          target_id: tgtActual,
           relation_type: 'INFLUENCES',
           relation_strength: strengthDefault,
           created_at: f.created_at
@@ -130,6 +179,8 @@ async function runMigration() {
     } else {
       console.log('🔗 Нет relations для заливки.');
     }
+  } else {
+    console.log('🔗 Пропускаю вставку relations — не было успешно вставленных facts.');
   }
 }
 
