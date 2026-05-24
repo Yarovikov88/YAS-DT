@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS facts (
   content TEXT NOT NULL,
   category_id INT REFERENCES categories(id) ON DELETE SET NULL,
   section_id INT REFERENCES sections(id) ON DELETE SET NULL,
-  relations INT[] DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   weight NUMERIC(3,2) DEFAULT 1.00,
   status VARCHAR(50) DEFAULT 'active',

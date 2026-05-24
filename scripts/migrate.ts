@@ -112,10 +112,6 @@ async function runMigration() {
       row.section = fact.section;
     }
 
-    if (hasFactColumn('relations')) {
-      row.relations = updatedRelations;
-    }
-
     if (hasFactColumn('id')) {
       row.id = nextIdBase + index;
     }
@@ -158,10 +154,9 @@ async function runMigration() {
         if (hasFactColumn('section')) {
           row.section = fact.section || 'default';
         }
-        if (hasFactColumn('relations')) {
-          row.relations = (fact.relations || [])
-            .map(rId => idMap.get(Number(rId)))
-            .filter((rId): rId is number => rId !== undefined);
+
+        if (hasFactColumn('id')) {
+          row.id = nextIdBase + index;
         }
 
         return row;
