@@ -65,34 +65,62 @@ async function runMigration() {
   const catMap = new Map(dbCats?.map(c => [c.name.toLowerCase(), c.id]));
   const secMap = new Map(dbSecs?.map(s => [s.name.toLowerCase(), s.id]));
 
-  // 3. Строим карту для перелинковки связей (массив relations)
+  // 3. Определяем базовый идентификатор для новых вставок
+  const { data: existingFactsData } = await supabase.from('facts').select('id').order('id', { ascending: false }).limit(1);
+  const nextIdBase = existingFactsData && existingFactsData.length > 0 ? existingFactsData[0].id + 1 : 1;
+  console.log(`🔢 Начальный новый id для миграции: ${nextIdBase}`);
+
+  // 4. Строим карту для перелинковки связей (массив relations)
   const idMap = new Map<number, number>();
   uniqueFacts.forEach((f, idx) => {
     if (!idMap.has(Number(f.id))) {
-      idMap.set(Number(f.id), idx + 1);
+      idMap.set(Number(f.id), nextIdBase + idx);
     }
   });
 
-  // 4. Пересобираем факты. ID берем НАПРЯМУЮ из индекса цикла
-  const finalFacts = uniqueFacts.map((fact, index) => {
-    const newId = index + 1; // ГАРАНТИЯ УНИКАЛЬНОСТИ 1..196
+  const { data: sampleFacts } = await supabase.from('facts').select('*').limit(1);
+  const availableFactColumns = new Set<string>();
+  if (sampleFacts && sampleFacts.length > 0) {
+    Object.keys(sampleFacts[0]).forEach(column => availableFactColumns.add(column));
+  } else {
+    ['id', 'title', 'content', 'category_id', 'section_id', 'category', 'section', 'weight', 'relations', 'created_at'].forEach(column => availableFactColumns.add(column));
+  }
 
+  const hasFactColumn = (column: string) => availableFactColumns.has(column);
+
+  const finalFacts = uniqueFacts.map((fact, index) => {
     const updatedRelations = (fact.relations || [])
       .map(rId => idMap.get(Number(rId)))
       .filter((rId): rId is number => rId !== undefined);
 
-    return {
-      id: newId, 
+    const row: any = {
       title: fact.title,
       content: fact.content,
-      category_id: catMap.get(fact.category.trim().toLowerCase()) || 1,
-      section_id: secMap.get(fact.section.trim().toLowerCase()) || 1,
-      original_category: fact.category,
-      original_section: fact.section,
       weight: fact.weight || 0.70,
-      relations: updatedRelations,
       created_at: fact.created_at ? new Date(fact.created_at).toISOString() : new Date().toISOString()
     };
+
+    if (hasFactColumn('category_id')) {
+      row.category_id = catMap.get(fact.category.trim().toLowerCase()) || 1;
+    } else if (hasFactColumn('category')) {
+      row.category = fact.category;
+    }
+
+    if (hasFactColumn('section_id')) {
+      row.section_id = secMap.get(fact.section.trim().toLowerCase()) || 1;
+    } else if (hasFactColumn('section')) {
+      row.section = fact.section;
+    }
+
+    if (hasFactColumn('relations')) {
+      row.relations = updatedRelations;
+    }
+
+    if (hasFactColumn('id')) {
+      row.id = nextIdBase + index;
+    }
+
+    return row;
   });
 
   // 5. Чистая заливка
@@ -112,14 +140,32 @@ async function runMigration() {
     console.error("💥 Ошибка импорта при вставке с category_id/section_id:", error.message || error);
     // Попытка fallback: вставить как plain category/section (строки), если в БД нет колонок category_id/section_id
     try {
-      const fallback = finalFacts.map(f => ({
-        title: f.title,
-        content: f.content,
-        category: (f as any).original_category || 'uncategorized',
-        section: (f as any).original_section || 'default',
-        weight: f.weight,
-        created_at: f.created_at
-      }));
+      const fallback = uniqueFacts.map((fact, index) => {
+        const row: any = {
+          title: fact.title,
+          content: fact.content,
+          weight: fact.weight || 0.70,
+          created_at: fact.created_at ? new Date(fact.created_at).toISOString() : new Date().toISOString()
+        };
+
+        if (hasFactColumn('id')) {
+          row.id = nextIdBase + index;
+        }
+
+        if (hasFactColumn('category')) {
+          row.category = fact.category || 'uncategorized';
+        }
+        if (hasFactColumn('section')) {
+          row.section = fact.section || 'default';
+        }
+        if (hasFactColumn('relations')) {
+          row.relations = (fact.relations || [])
+            .map(rId => idMap.get(Number(rId)))
+            .filter((rId): rId is number => rId !== undefined);
+        }
+
+        return row;
+      });
 
       const res2 = await supabase.from('facts').insert(fallback).select();
       data = res2.data;

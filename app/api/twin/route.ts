@@ -72,18 +72,47 @@ export async function POST(request: Request) {
     const factToInsert = aiResult.new_fact || aiResult.fact;
     if (!factToInsert) throw new Error('AI response missing fact payload');
 
-    // Ensure minimal fields
+    const { data: categoryRows } = await supabase.from('categories').select('id,name');
+    const { data: sectionRows } = await supabase.from('sections').select('id,name');
+    const categoryMap = new Map((categoryRows || []).map((c: any) => [c.name.trim().toLowerCase(), c.id]));
+    const sectionMap = new Map((sectionRows || []).map((s: any) => [s.name.trim().toLowerCase(), s.id]));
+
+    const { data: sampleFacts } = await supabase.from('facts').select('*').limit(1);
+    const existingFactColumns = new Set<string>();
+    if (sampleFacts && sampleFacts.length > 0) {
+      Object.keys(sampleFacts[0]).forEach(column => existingFactColumns.add(column));
+    } else {
+      ['title', 'content', 'category_id', 'section_id', 'category', 'section', 'weight', 'hpi_impact_sphere', 'energy_cost', 'voltage_generation', 'created_at'].forEach(column => existingFactColumns.add(column));
+    }
+    const hasFactColumn = (name: string) => existingFactColumns.has(name);
+
     const factRow: any = {
       title: factToInsert.title,
       content: factToInsert.content,
-      category: factToInsert.category || factToInsert.category_id || 'uncategorized',
-      section: factToInsert.section || 'default',
       weight: factToInsert.weight || 0.7,
       hpi_impact_sphere: factToInsert.metrics?.hpi_impact_sphere || null,
       energy_cost: factToInsert.metrics?.energy_cost || null,
       voltage_generation: factToInsert.metrics?.voltage_generation || null,
       created_at: new Date().toISOString()
     };
+
+    if (factToInsert.category_id) {
+      factRow.category_id = factToInsert.category_id;
+    } else if (factToInsert.category) {
+      factRow.category_id = categoryMap.get(factToInsert.category.trim().toLowerCase()) || 1;
+      if (hasFactColumn('category')) {
+        factRow.category = factToInsert.category;
+      }
+    }
+
+    if (factToInsert.section_id) {
+      factRow.section_id = factToInsert.section_id;
+    } else if (factToInsert.section) {
+      factRow.section_id = sectionMap.get(factToInsert.section.trim().toLowerCase()) || 1;
+      if (hasFactColumn('section')) {
+        factRow.section = factToInsert.section;
+      }
+    }
 
     // Insert fact and get assigned id
     const { data: insertedFacts, error: insertError } = await supabase.from('facts').insert([factRow]).select();
