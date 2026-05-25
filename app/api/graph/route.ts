@@ -8,13 +8,20 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 }
 
 async function fetchSupabase<T>(path: string) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/${path}`);
+  // Ensure limit is high enough
+  if (!url.searchParams.has('limit')) {
+    url.searchParams.set('limit', '1000');
+  }
+
+  const res = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${SUPABASE_KEY}`,
       apikey: SUPABASE_KEY,
       Accept: 'application/json',
       Prefer: 'count=exact'
-    }
+    },
+    cache: 'no-store'
   });
 
   if (!res.ok) {
