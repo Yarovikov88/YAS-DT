@@ -1,29 +1,43 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be defined');
+}
+
+async function fetchSupabase<T>(path: string) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      apikey: SUPABASE_KEY,
+      Accept: 'application/json',
+      Prefer: 'count=exact'
+    }
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase REST ${path} failed: ${res.status} ${body}`);
+  }
+
+  return (await res.json()) as T;
+}
 
 export async function GET() {
   try {
-    const { data: facts, error: factsErr } = await supabase.from('facts').select('id,title,weight,category_id,section_id');
-    if (factsErr) throw new Error(factsErr.message);
+    const [facts, categories, sections, relations] = await Promise.all([
+      fetchSupabase<any[]>('facts?select=id,title,weight,category_id,section_id'),
+      fetchSupabase<any[]>('categories?select=id,name'),
+      fetchSupabase<any[]>('sections?select=id,name'),
+      fetchSupabase<any[]>('fact_relations?select=id,source_id,target_id,relation_type,relation_strength')
+    ]);
 
-    const { data: categories, error: catErr } = await supabase.from('categories').select('id,name');
-    if (catErr) throw new Error(catErr.message);
+    const categoryMap = new Map((categories || []).map((c) => [c.id, c.name]));
+    const sectionMap = new Map((sections || []).map((s) => [s.id, s.name]));
 
-    const { data: sections, error: secErr } = await supabase.from('sections').select('id,name');
-    if (secErr) throw new Error(secErr.message);
-
-    const { data: relations, error: relErr } = await supabase.from('fact_relations').select('*');
-    if (relErr) throw new Error(relErr.message);
-
-    const categoryMap = new Map((categories || []).map((c: any) => [c.id, c.name]));
-    const sectionMap = new Map((sections || []).map((s: any) => [s.id, s.name]));
-
-    const nodes = (facts || []).map((f: any) => ({
+    const nodes = (facts || []).map((f) => ({
       id: f.id,
       label: f.title,
       category: categoryMap.get(f.category_id) || null,
@@ -31,7 +45,7 @@ export async function GET() {
       weight: Number(f.weight) || 1.0
     }));
 
-    const edges = (relations || []).map((r: any) => ({
+    const edges = (relations || []).map((r) => ({
       id: r.id,
       source: r.source_id,
       target: r.target_id,
