@@ -28,7 +28,7 @@ async function fetchSupabase<T>(path: string) {
 export async function GET() {
   try {
     const [facts, categories, sections, relations] = await Promise.all([
-      fetchSupabase<any[]>('facts?select=id,title,weight,category_id,section_id'),
+      fetchSupabase<any[]>('facts?select=id,title,content,weight,category_id,section_id'),
       fetchSupabase<any[]>('categories?select=id,name'),
       fetchSupabase<any[]>('sections?select=id,name'),
       fetchSupabase<any[]>('fact_relations?select=id,source_id,target_id,relation_type,relation_strength')
@@ -40,6 +40,7 @@ export async function GET() {
     const nodes = (facts || []).map((f) => ({
       id: f.id,
       label: f.title,
+      description: f.content || '',
       category: categoryMap.get(f.category_id) || null,
       section: sectionMap.get(f.section_id) || null,
       weight: Number(f.weight) || 1.0

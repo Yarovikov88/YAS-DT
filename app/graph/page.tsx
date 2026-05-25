@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 type GraphNode = {
   id: number;
   label: string;
+  description: string;
   weight: number;
   category: string | null;
   section: string | null;
@@ -281,6 +282,12 @@ export default function GraphPage() {
               <strong>Заголовок</strong>
               <div style={{ marginTop: '6px', color: '#ddd', fontSize: '0.9rem', wordBreak: 'break-word' }}>{selectedNode.label}</div>
             </div>
+            {selectedNode.description && (
+              <div>
+                <strong>Описание</strong>
+                <div style={{ marginTop: '6px', color: '#bbb', fontSize: '0.85rem', lineHeight: '1.4', wordBreak: 'break-word', maxHeight: '200px', overflowY: 'auto' }}>{selectedNode.description}</div>
+              </div>
+            )}
             <div>
               <strong>Категория</strong>
               <div style={{ marginTop: '6px', color: '#ccc' }}>{selectedNode.category || 'не задана'}</div>
