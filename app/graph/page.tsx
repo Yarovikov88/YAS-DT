@@ -6,8 +6,11 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 interface Node {
   id: number;
   label: string;
+  content?: string;
   category: string;
   section: string;
+  sphere?: string;
+  tags?: string[];
   weight: number;
   age?: number;
   x: number;
@@ -24,19 +27,100 @@ interface Edge {
 }
 
 // ── Константы ─────────────────────────────────────────────────────────────
-const CATEGORY_COLORS: Record<string, string> = {
-  'Военный':      '#4a9eff',
-  'Технология':   '#00d4aa',
-  'Психофизика':  '#ff6b6b',
-  'Юридический':  '#ffd93d',
-  'Личное':       '#c77dff',
-  'Кейс':         '#ff9f43',
-  'Принцип':      '#48dbfb',
-  'Философия':    '#ff6b9d',
+// Цвета по 8 сферам HPI
+const SPHERE_COLORS: Record<string, string> = {
+  loved:    '#ff6b9d',  // 💖 Любимые
+  family:   '#c77dff',  // 🏡 Родные
+  friends:  '#48dbfb',  // 🤝 Друзья
+  career:   '#4a9eff',  // 💼 Карьера
+  physical: '#00d4aa',  // ♂️ Физическое
+  mental:   '#ff6b6b',  // 🧠 Ментальное
+  hobby:    '#ff9f43',  // 🎨 Хобби
+  wealth:   '#ffd93d',  // 💰 Благосостояние
+};
+const SPHERE_LABELS: Record<string, string> = {
+  loved:    '💖 Любимые',
+  family:   '🏡 Родные',
+  friends:  '🤝 Друзья',
+  career:   '💼 Карьера',
+  physical: '♂️ Физическое',
+  mental:   '🧠 Ментальное',
+  hobby:    '🎨 Хобби',
+  wealth:   '💰 Благосостояние',
 };
 const DEFAULT_COLOR = '#888888';
-const getColor = (cat: string) => CATEGORY_COLORS[cat] ?? DEFAULT_COLOR;
+const getColor = (sphere?: string) => (sphere && SPHERE_COLORS[sphere]) ?? DEFAULT_COLOR;
+const getSphereLabel = (sphere?: string) => (sphere && SPHERE_LABELS[sphere]) ?? '— без сферы';
 const nodeRadius = (w: number) => 4 + (w || 0.5) * 5;
+
+// ── Лёгкий markdown-рендерер для content ──────────────────────────────────
+// Поддерживает: ### заголовки, **жирный**, *курсив*, - списки, переносы строк
+function renderMarkdown(text: string): React.ReactNode {
+  const blocks = text.split(/\n\n+/);
+  return blocks.map((block, bi) => {
+    const trimmed = block.trim();
+    if (!trimmed) return null;
+
+    // Заголовки H3 / H2 / H1
+    if (trimmed.startsWith('### ')) {
+      return <h4 key={bi} style={{ fontSize: '0.82rem', color: '#fff', margin: '14px 0 6px', fontWeight: 600 }}>{inline(trimmed.slice(4))}</h4>;
+    }
+    if (trimmed.startsWith('## ')) {
+      return <h3 key={bi} style={{ fontSize: '0.88rem', color: '#fff', margin: '16px 0 6px', fontWeight: 600 }}>{inline(trimmed.slice(3))}</h3>;
+    }
+    if (trimmed.startsWith('# ')) {
+      return <h2 key={bi} style={{ fontSize: '0.95rem', color: '#fff', margin: '18px 0 8px', fontWeight: 700 }}>{inline(trimmed.slice(2))}</h2>;
+    }
+
+    // Горизонтальная линия
+    if (/^---+$/.test(trimmed)) {
+      return <hr key={bi} style={{ border: 'none', borderTop: '1px solid #1a1a1a', margin: '14px 0' }} />;
+    }
+
+    // Список (несколько строк, начинаются с - или *)
+    const lines = trimmed.split('\n');
+    if (lines.every(l => /^\s*[-*]\s/.test(l))) {
+      return (
+        <ul key={bi} style={{ margin: '6px 0', paddingLeft: 18, color: '#bbb', fontSize: '0.78rem', lineHeight: 1.55 }}>
+          {lines.map((l, li) => (
+            <li key={li} style={{ marginBottom: 3 }}>{inline(l.replace(/^\s*[-*]\s/, ''))}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    // Обычный параграф (с переводами строк → <br/>)
+    return (
+      <p key={bi} style={{ margin: '6px 0', color: '#bbb', fontSize: '0.78rem', lineHeight: 1.6 }}>
+        {lines.map((line, li) => (
+          <span key={li}>
+            {inline(line)}
+            {li < lines.length - 1 && <br />}
+          </span>
+        ))}
+      </p>
+    );
+  });
+}
+
+// Inline: **жирный**, *курсив*
+function inline(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  const re = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let last = 0, m: RegExpExecArray | null, idx = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const tok = m[0];
+    if (tok.startsWith('**')) {
+      parts.push(<strong key={`b${idx++}`} style={{ color: '#fff' }}>{tok.slice(2, -2)}</strong>);
+    } else {
+      parts.push(<em key={`i${idx++}`} style={{ color: '#ddd' }}>{tok.slice(1, -1)}</em>);
+    }
+    last = m.index + tok.length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
 
 // ── Web Worker для физики ─────────────────────────────────────────────────
 // Inline через Blob — без bundling-настроек.
@@ -129,8 +213,9 @@ export default function GraphPage() {
   const [progress, setProgress]   = useState(0); // 0-1, прогресс физики
 
   const [selected, setSelected]   = useState<Node | null>(null);
-  const [search, setSearch]       = useState('');
-  const [filterCat, setFilterCat] = useState('');
+  const [search, setSearch]         = useState('');
+  const [filterSphere, setFilterSphere] = useState('');
+  const [filterTag, setFilterTag]       = useState('');
 
   // Viewport: tx/ty/scale в ref — pan/zoom не вызывают ре-рендер всего графа
   const viewRef = useRef({ tx: 0, ty: 0, scale: 1 });
@@ -308,18 +393,23 @@ export default function GraphPage() {
   // ── Фильтрация ───────────────────────────────────────────────────────────
   const sq = search.toLowerCase();
   const filteredIds = useMemo(() => {
-    if (!sq && !filterCat) return null;
+    if (!sq && !filterSphere && !filterTag) return null;
     return new Set(nodes.filter(n =>
       (!sq || n.label.toLowerCase().includes(sq)) &&
-      (!filterCat || n.category === filterCat)
+      (!filterSphere || n.sphere === filterSphere) &&
+      (!filterTag    || (n.tags || []).includes(filterTag))
     ).map(n => n.id));
-  }, [nodes, sq, filterCat]);
+  }, [nodes, sq, filterSphere, filterTag]);
 
   const isDim = (id: number) => filteredIds !== null && !filteredIds.has(id);
 
   // ── Производные данные ───────────────────────────────────────────────────
-  const categories = useMemo(() => [...new Set(nodes.map(n => n.category))].sort(), [nodes]);
-  const nodeMap    = useMemo(() => new Map(nodes.map(n => [n.id, n])), [nodes]);
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    for (const n of nodes) (n.tags || []).forEach(t => set.add(t));
+    return [...set].sort();
+  }, [nodes]);
+  const nodeMap = useMemo(() => new Map(nodes.map(n => [n.id, n])), [nodes]);
   const selectedEdges = selected ? edges.filter(e => e.source === selected.id || e.target === selected.id) : [];
 
   // Топ-N узлов по weight для всегдашнего показа лейбла
@@ -418,7 +508,7 @@ export default function GraphPage() {
               const isSel = selected?.id === n.id;
               const dim   = isDim(n.id);
               const r     = nodeRadius(n.weight);
-              const color = getColor(n.category);
+              const color = getColor(n.sphere);
 
               return (
                 <g
@@ -535,24 +625,31 @@ export default function GraphPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск…"
             style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fff', width: 130, fontSize: '0.85rem' }} />
         </div>
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
+        <select value={filterSphere} onChange={e => setFilterSphere(e.target.value)}
           style={{ background: 'rgba(0,0,0,0.85)', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
-          <option value="">Все категории</option>
-          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          <option value="">Все сферы</option>
+          {Object.entries(SPHERE_LABELS).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
+          ))}
+        </select>
+        <select value={filterTag} onChange={e => setFilterTag(e.target.value)}
+          style={{ background: 'rgba(0,0,0,0.85)', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
+          <option value="">Все теги</option>
+          {allTags.map(t => <option key={t} value={t}>#{t}</option>)}
         </select>
         <div style={{ background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: '7px 12px', color: '#555', fontSize: '0.78rem' }}>
           {stats.nodes_count} узлов · {stats.edges_count} связей
         </div>
       </div>
 
-      {/* Легенда */}
+      {/* Легенда — сферы HPI */}
       <div style={{ position: 'absolute', bottom: 16, left: 12, background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: '10px 14px', zIndex: 10 }}>
-        {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
-          <div key={cat} onClick={() => setFilterCat(p => p === cat ? '' : cat)}
+        {Object.entries(SPHERE_LABELS).map(([sphere, label]) => (
+          <div key={sphere} onClick={() => setFilterSphere(p => p === sphere ? '' : sphere)}
             style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginBottom: 4 }}>
-            <div style={{ width: 9, height: 9, borderRadius: '50%', background: color, flexShrink: 0,
-              boxShadow: filterCat === cat ? `0 0 6px ${color}` : 'none' }} />
-            <span style={{ color: filterCat === cat ? '#fff' : '#777', fontSize: '0.76rem' }}>{cat}</span>
+            <div style={{ width: 9, height: 9, borderRadius: '50%', background: SPHERE_COLORS[sphere], flexShrink: 0,
+              boxShadow: filterSphere === sphere ? `0 0 6px ${SPHERE_COLORS[sphere]}` : 'none' }} />
+            <span style={{ color: filterSphere === sphere ? '#fff' : '#777', fontSize: '0.76rem' }}>{label}</span>
           </div>
         ))}
       </div>
@@ -602,13 +699,31 @@ export default function GraphPage() {
         <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 340, background: 'rgba(8,8,8,0.97)', borderLeft: '1px solid #1a1a1a', padding: '20px 18px', overflowY: 'auto', zIndex: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: getColor(selected.category) + '22', color: getColor(selected.category), fontSize: '0.7rem', marginBottom: 8 }}>
-                {selected.category}
+              <div style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: getColor(selected.sphere) + '22', color: getColor(selected.sphere), fontSize: '0.7rem', marginBottom: 8 }}>
+                {getSphereLabel(selected.sphere)}
               </div>
               <div style={{ fontSize: '0.95rem', fontWeight: 'bold', lineHeight: 1.4 }}>{selected.label}</div>
             </div>
             <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', color: '#444', fontSize: '1.3rem', cursor: 'pointer', marginLeft: 8 }}>×</button>
           </div>
+
+          {/* Теги */}
+          {selected.tags && selected.tags.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
+              {selected.tags.map(t => (
+                <span key={t}
+                  onClick={() => setFilterTag(prev => prev === t ? '' : t)}
+                  style={{
+                    fontSize: '0.68rem',
+                    padding: '2px 7px',
+                    borderRadius: 3,
+                    background: filterTag === t ? '#fff' : '#1a1a1a',
+                    color: filterTag === t ? '#000' : '#888',
+                    cursor: 'pointer',
+                  }}>#{t}</span>
+              ))}
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: 16, fontSize: '0.76rem', color: '#555', marginBottom: 8 }}>
             <span>Вес: <span style={{ color: '#888' }}>{selected.weight}</span></span>
@@ -616,9 +731,25 @@ export default function GraphPage() {
           </div>
           <div style={{ fontSize: '0.73rem', color: '#3a3a3a', marginBottom: 16 }}>{selected.section}</div>
 
+          {selected.content && (
+            <div style={{
+              borderTop: '1px solid #1a1a1a',
+              paddingTop: 12,
+              marginBottom: 16,
+            }}>
+              {renderMarkdown(selected.content)}
+            </div>
+          )}
+
           {selectedEdges.length > 0 && (
             <>
-              <div style={{ fontSize: '0.73rem', color: '#444', marginBottom: 8 }}>Связи ({selectedEdges.length})</div>
+              <div style={{
+                borderTop: '1px solid #1a1a1a',
+                paddingTop: 12,
+                fontSize: '0.73rem',
+                color: '#444',
+                marginBottom: 8,
+              }}>Связи ({selectedEdges.length})</div>
               {selectedEdges.map((e, i) => {
                 const otherId = e.source === selected.id ? e.target : e.source;
                 const other   = nodeMap.get(otherId);

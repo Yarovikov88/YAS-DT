@@ -1,0 +1,1746 @@
+[
+  {
+    "id": 1,
+    "sphere": "family",
+    "tags": [
+      "principle",
+      "family",
+      "genesis"
+    ]
+  },
+  {
+    "id": 2,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "leadership",
+      "academy"
+    ]
+  },
+  {
+    "id": 3,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 4,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "leadership",
+      "academy"
+    ]
+  },
+  {
+    "id": 5,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "leadership",
+      "academy"
+    ]
+  },
+  {
+    "id": 6,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 7,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "business",
+      "genesis"
+    ]
+  },
+  {
+    "id": 8,
+    "sphere": "career",
+    "tags": [
+      "mentor",
+      "leadership",
+      "academy"
+    ]
+  },
+  {
+    "id": 9,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "it",
+      "flynav"
+    ]
+  },
+  {
+    "id": 10,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 11,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 12,
+    "sphere": "mental",
+    "tags": [
+      "case",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 13,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 14,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "leadership",
+      "academy"
+    ]
+  },
+  {
+    "id": 15,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 16,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "military",
+      "growth"
+    ]
+  },
+  {
+    "id": 17,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 18,
+    "sphere": "wealth",
+    "tags": [
+      "protocol",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 19,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 20,
+    "sphere": "physical",
+    "tags": [
+      "method",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 21,
+    "sphere": "family",
+    "tags": [
+      "philosophy",
+      "family",
+      "genesis"
+    ]
+  },
+  {
+    "id": 22,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 23,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "it",
+      "flynav"
+    ]
+  },
+  {
+    "id": 24,
+    "sphere": "loved",
+    "tags": [
+      "protocol",
+      "family",
+      "growth"
+    ]
+  },
+  {
+    "id": 25,
+    "sphere": "career",
+    "tags": [
+      "mentor",
+      "leadership",
+      "academy"
+    ]
+  },
+  {
+    "id": 26,
+    "sphere": "family",
+    "tags": [
+      "method",
+      "family",
+      "spb-msk"
+    ]
+  },
+  {
+    "id": 27,
+    "sphere": "family",
+    "tags": [
+      "case",
+      "family",
+      "spb-msk"
+    ]
+  },
+  {
+    "id": 28,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "intelligence",
+      "growth"
+    ]
+  },
+  {
+    "id": 29,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 30,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "spb-msk"
+    ]
+  },
+  {
+    "id": 31,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 32,
+    "sphere": "wealth",
+    "tags": [
+      "method",
+      "business",
+      "spb-msk"
+    ]
+  },
+  {
+    "id": 33,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "flynav"
+    ]
+  },
+  {
+    "id": 34,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "leadership",
+      "flynav"
+    ]
+  },
+  {
+    "id": 35,
+    "sphere": "hobby",
+    "tags": [
+      "algorithm",
+      "sport",
+      "robius"
+    ]
+  },
+  {
+    "id": 36,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it"
+    ]
+  },
+  {
+    "id": 37,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 38,
+    "sphere": "hobby",
+    "tags": [
+      "philosophy",
+      "family",
+      "robius"
+    ]
+  },
+  {
+    "id": 39,
+    "sphere": "hobby",
+    "tags": [
+      "case",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 40,
+    "sphere": "friends",
+    "tags": [
+      "mentor",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 41,
+    "sphere": "loved",
+    "tags": [
+      "case",
+      "family"
+    ]
+  },
+  {
+    "id": 42,
+    "sphere": "loved",
+    "tags": [
+      "principle",
+      "family"
+    ]
+  },
+  {
+    "id": 43,
+    "sphere": "family",
+    "tags": [
+      "philosophy",
+      "family",
+      "genesis"
+    ]
+  },
+  {
+    "id": 44,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "leadership"
+    ]
+  },
+  {
+    "id": 45,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 46,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 47,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 48,
+    "sphere": "physical",
+    "tags": [
+      "algorithm",
+      "sport",
+      "academy"
+    ]
+  },
+  {
+    "id": 49,
+    "sphere": "physical",
+    "tags": [
+      "algorithm",
+      "sport",
+      "academy"
+    ]
+  },
+  {
+    "id": 50,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "leadership"
+    ]
+  },
+  {
+    "id": 51,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 52,
+    "sphere": "family",
+    "tags": [
+      "principle",
+      "family",
+      "spb-msk"
+    ]
+  },
+  {
+    "id": 53,
+    "sphere": "hobby",
+    "tags": [
+      "mentor",
+      "robius"
+    ]
+  },
+  {
+    "id": 54,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "leadership"
+    ]
+  },
+  {
+    "id": 55,
+    "sphere": "friends",
+    "tags": [
+      "lesson",
+      "it"
+    ]
+  },
+  {
+    "id": 56,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 57,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "it",
+      "spb-msk"
+    ]
+  },
+  {
+    "id": 58,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "it",
+      "expansion"
+    ]
+  },
+  {
+    "id": 59,
+    "sphere": "career",
+    "tags": [
+      "mentor",
+      "business",
+      "expansion"
+    ]
+  },
+  {
+    "id": 60,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "leadership"
+    ]
+  },
+  {
+    "id": 61,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "it",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 65,
+    "sphere": "career",
+    "tags": [
+      "lesson",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 66,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 69,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 72,
+    "sphere": "wealth",
+    "tags": [
+      "method",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 75,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 76,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 77,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 80,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it"
+    ]
+  },
+  {
+    "id": 81,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 82,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it"
+    ]
+  },
+  {
+    "id": 84,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 85,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "business"
+    ]
+  },
+  {
+    "id": 86,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "it",
+      "leadership"
+    ]
+  },
+  {
+    "id": 87,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "leadership"
+    ]
+  },
+  {
+    "id": 88,
+    "sphere": "hobby",
+    "tags": [
+      "method",
+      "it",
+      "robius",
+      "growth"
+    ]
+  },
+  {
+    "id": 89,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 90,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 91,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 92,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 93,
+    "sphere": "hobby",
+    "tags": [
+      "algorithm",
+      "leadership",
+      "robius"
+    ]
+  },
+  {
+    "id": 94,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 95,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 96,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 97,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "business",
+      "genesis"
+    ]
+  },
+  {
+    "id": 98,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 99,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "military",
+      "academy"
+    ]
+  },
+  {
+    "id": 100,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "expansion"
+    ]
+  },
+  {
+    "id": 101,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "legal",
+      "business"
+    ]
+  },
+  {
+    "id": 102,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 103,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 104,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 105,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "legal",
+      "robius"
+    ]
+  },
+  {
+    "id": 106,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 107,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "legal",
+      "robius"
+    ]
+  },
+  {
+    "id": 108,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "business",
+      "robius"
+    ]
+  },
+  {
+    "id": 109,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "legal",
+      "robius"
+    ]
+  },
+  {
+    "id": 110,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 111,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "business",
+      "robius"
+    ]
+  },
+  {
+    "id": 112,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "legal",
+      "robius"
+    ]
+  },
+  {
+    "id": 113,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 114,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 115,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "business",
+      "robius"
+    ]
+  },
+  {
+    "id": 116,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 117,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "robius"
+    ]
+  },
+  {
+    "id": 118,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 119,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 120,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 121,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 122,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 123,
+    "sphere": "career",
+    "tags": [
+      "mentor",
+      "leadership",
+      "flynav"
+    ]
+  },
+  {
+    "id": 124,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 125,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 126,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 127,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 128,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 129,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 130,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "business"
+    ]
+  },
+  {
+    "id": 131,
+    "sphere": "physical",
+    "tags": [
+      "protocol",
+      "sport"
+    ]
+  },
+  {
+    "id": 132,
+    "sphere": "physical",
+    "tags": [
+      "method",
+      "sport"
+    ]
+  },
+  {
+    "id": 133,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 134,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 135,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "legal",
+      "growth"
+    ]
+  },
+  {
+    "id": 136,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 137,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 138,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 139,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 140,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "business",
+      "robius"
+    ]
+  },
+  {
+    "id": 141,
+    "sphere": "family",
+    "tags": [
+      "principle",
+      "family",
+      "growth"
+    ]
+  },
+  {
+    "id": 142,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 143,
+    "sphere": "mental",
+    "tags": [
+      "lesson",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 144,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 145,
+    "sphere": "physical",
+    "tags": [
+      "method",
+      "sport",
+      "robius"
+    ]
+  },
+  {
+    "id": 146,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 147,
+    "sphere": "wealth",
+    "tags": [
+      "philosophy",
+      "business",
+      "robius"
+    ]
+  },
+  {
+    "id": 148,
+    "sphere": "family",
+    "tags": [
+      "philosophy",
+      "family",
+      "growth"
+    ]
+  },
+  {
+    "id": 149,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 150,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 151,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "flynav"
+    ]
+  },
+  {
+    "id": 152,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "expansion"
+    ]
+  },
+  {
+    "id": 153,
+    "sphere": "hobby",
+    "tags": [
+      "philosophy",
+      "it",
+      "robius"
+    ]
+  },
+  {
+    "id": 154,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "intelligence",
+      "business"
+    ]
+  },
+  {
+    "id": 155,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "leadership"
+    ]
+  },
+  {
+    "id": 156,
+    "sphere": "wealth",
+    "tags": [
+      "algorithm",
+      "business",
+      "expansion"
+    ]
+  },
+  {
+    "id": 157,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "legal",
+      "leadership"
+    ]
+  },
+  {
+    "id": 158,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 159,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "flynav"
+    ]
+  },
+  {
+    "id": 160,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "business",
+      "leadership"
+    ]
+  },
+  {
+    "id": 161,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 162,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 163,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 164,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "robius"
+    ]
+  },
+  {
+    "id": 165,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "legal",
+      "business"
+    ]
+  },
+  {
+    "id": 166,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "it",
+      "leadership"
+    ]
+  },
+  {
+    "id": 167,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 168,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 169,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 170,
+    "sphere": "loved",
+    "tags": [
+      "philosophy",
+      "family",
+      "growth"
+    ]
+  },
+  {
+    "id": 171,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "business",
+      "flynav"
+    ]
+  },
+  {
+    "id": 172,
+    "sphere": "family",
+    "tags": [
+      "principle",
+      "family",
+      "academy"
+    ]
+  },
+  {
+    "id": 173,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 174,
+    "sphere": "physical",
+    "tags": [
+      "protocol",
+      "sport",
+      "growth"
+    ]
+  },
+  {
+    "id": 175,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 176,
+    "sphere": "family",
+    "tags": [
+      "philosophy",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 177,
+    "sphere": "wealth",
+    "tags": [
+      "protocol",
+      "legal",
+      "business"
+    ]
+  },
+  {
+    "id": 178,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 179,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 180,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 181,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "leadership",
+      "growth"
+    ]
+  },
+  {
+    "id": 182,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 183,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "legal",
+      "growth"
+    ]
+  },
+  {
+    "id": 184,
+    "sphere": "mental",
+    "tags": [
+      "lesson",
+      "intelligence",
+      "growth"
+    ]
+  },
+  {
+    "id": 185,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 186,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 187,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 188,
+    "sphere": "career",
+    "tags": [
+      "case",
+      "legal",
+      "growth"
+    ]
+  },
+  {
+    "id": 189,
+    "sphere": "mental",
+    "tags": [
+      "philosophy",
+      "it",
+      "growth"
+    ]
+  },
+  {
+    "id": 190,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 191,
+    "sphere": "career",
+    "tags": [
+      "philosophy",
+      "military",
+      "growth"
+    ]
+  },
+  {
+    "id": 192,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "business",
+      "growth"
+    ]
+  },
+  {
+    "id": 193,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 194,
+    "sphere": "career",
+    "tags": [
+      "method",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 195,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it"
+    ]
+  },
+  {
+    "id": 196,
+    "sphere": "family",
+    "tags": [
+      "protocol",
+      "family",
+      "it"
+    ]
+  },
+  {
+    "id": 197,
+    "sphere": "wealth",
+    "tags": [
+      "method",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 198,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 199,
+    "sphere": "mental",
+    "tags": [
+      "method",
+      "it"
+    ]
+  },
+  {
+    "id": 200,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it"
+    ]
+  },
+  {
+    "id": 201,
+    "sphere": "career",
+    "tags": [
+      "algorithm",
+      "it",
+      "genesis"
+    ]
+  },
+  {
+    "id": 202,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "leadership",
+      "it"
+    ]
+  },
+  {
+    "id": 203,
+    "sphere": "mental",
+    "tags": [
+      "protocol",
+      "it"
+    ]
+  },
+  {
+    "id": 204,
+    "sphere": "mental",
+    "tags": [
+      "algorithm",
+      "it"
+    ]
+  },
+  {
+    "id": 205,
+    "sphere": "mental",
+    "tags": [
+      "principle",
+      "it"
+    ]
+  },
+  {
+    "id": 206,
+    "sphere": "career",
+    "tags": [
+      "protocol",
+      "it",
+      "business"
+    ]
+  },
+  {
+    "id": 207,
+    "sphere": "career",
+    "tags": [
+      "principle",
+      "it"
+    ]
+  },
+  {
+    "id": 208,
+    "sphere": "friends",
+    "tags": [
+      "protocol",
+      "business",
+      "growth"
+    ]
+  }
+]

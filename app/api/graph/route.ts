@@ -15,9 +15,7 @@ export async function GET(request: Request) {
     const { data: facts, error: factsError } = await supabase
       .from('facts')
       .select('*')
-      .eq('status', 'active');
-
-    if (factsError) {
+      .eq('status', 'active');    if (factsError) {
       return NextResponse.json({ error: factsError.message }, { status: 500 });
     }
 
@@ -43,8 +41,11 @@ export async function GET(request: Request) {
     const nodes = facts.map(fact => ({
       id: fact.id,
       label: fact.title,
+      content: fact.content,
       category: fact.category,
       section: fact.section,
+      sphere: fact.sphere,
+      tags: fact.tags || [],
       weight: fact.weight,
       age: fact.age
     }));
