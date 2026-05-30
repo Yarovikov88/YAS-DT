@@ -122,6 +122,185 @@ function inline(text: string): React.ReactNode {
   return parts;
 }
 
+// ── Двухползунковый фильтр диапазона (возраст / вес) ───────────────────────
+function RangeFilter({ label, bounds, value, step, fmt, onChange, onReset }: {
+  label: string;
+  bounds: [number, number];
+  value: [number, number];
+  step: number;
+  fmt: (n: number) => string;
+  onChange: (v: [number, number]) => void;
+  onReset?: () => void;
+}) {
+  const [min, max] = bounds;
+  const [lo, hi] = value;
+  const span = Math.max(max - min, 1e-9);
+  const loPct = ((lo - min) / span) * 100;
+  const hiPct = ((hi - min) / span) * 100;
+  const active = lo > min || hi < max;
+  // Когда нижний ползунок в верхней половине — поднимаем его над верхним,
+  // чтобы оставался захватываемым при сближении бегунков.
+  const loOnTop = lo > min + span * 0.5;
+
+  return (
+    <div style={{ background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: '5px 12px 7px', width: 160 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <span style={{ fontSize: '0.74rem', color: active ? '#fff' : '#888' }}>{label}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ fontSize: '0.68rem', color: active ? '#4a9eff' : '#555', fontFamily: 'monospace' }}>
+            {fmt(lo)}–{fmt(hi)}
+          </span>
+          {active && onReset && (
+            <span onClick={onReset} title="Сбросить" style={{ color: '#555', cursor: 'pointer', fontSize: '0.8rem', lineHeight: 1 }}>×</span>
+          )}
+        </span>
+      </div>
+      <div className="range-dual">
+        <div className="range-track" />
+        <div className="range-fill" style={{ left: `${loPct}%`, right: `${100 - hiPct}%` }} />
+        <input
+          type="range" min={min} max={max} step={step} value={lo}
+          style={{ zIndex: loOnTop ? 5 : 3 }}
+          onChange={e => onChange([Math.min(Number(e.target.value), hi), hi])}
+        />
+        <input
+          type="range" min={min} max={max} step={step} value={hi}
+          style={{ zIndex: 4 }}
+          onChange={e => onChange([lo, Math.max(Number(e.target.value), lo)])}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Excel-подобный мультиселект с чекбоксами ───────────────────────────────
+interface MultiOption {
+  value: string;
+  label: React.ReactNode;     // как показать в списке
+  color?: string;             // точка-индикатор слева (для сфер)
+  count?: number;             // сколько узлов подходит
+}
+
+function MultiSelect({ title, options, selected, onChange, searchable }: {
+  title: string;
+  options: MultiOption[];
+  selected: Set<string>;      // выбранные value; считаем «всё выбрано», если selected пуст? — нет, явный набор
+  onChange: (next: Set<string>) => void;
+  searchable?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Закрытие по клику вне
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  const allValues = options.map(o => o.value);
+  const allSelected = selected.size === allValues.length;
+  const noneSelected = selected.size === 0;
+
+  const filtered = q
+    ? options.filter(o => o.value.toLowerCase().includes(q.toLowerCase()))
+    : options;
+
+  const toggle = (val: string) => {
+    const next = new Set(selected);
+    next.has(val) ? next.delete(val) : next.add(val);
+    onChange(next);
+  };
+  const selectAll = () => onChange(new Set(allValues));
+  const clearAll  = () => onChange(new Set());
+
+  // Текст на кнопке
+  const summary = allSelected ? 'все'
+    : noneSelected ? 'ничего'
+    : `${selected.size} из ${allValues.length}`;
+
+  return (
+    <div ref={rootRef} style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: 'rgba(0,0,0,0.85)', border: '1px solid',
+          borderColor: open ? '#4a9eff' : 'transparent',
+          borderRadius: 8, padding: '7px 12px', color: '#fff',
+          fontSize: '0.82rem', cursor: 'pointer', whiteSpace: 'nowrap',
+        }}>
+        <span>{title}</span>
+        <span style={{ color: allSelected ? '#555' : '#4a9eff', fontSize: '0.72rem' }}>({summary})</span>
+        <span style={{ color: '#555', fontSize: '0.6rem', transform: open ? 'rotate(180deg)' : 'none' }}>▼</span>
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 40,
+          background: '#0d0d0d', border: '1px solid #222', borderRadius: 8,
+          minWidth: 200, maxWidth: 280, boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+          overflow: 'hidden',
+        }}>
+          {/* Действия */}
+          <div style={{ display: 'flex', borderBottom: '1px solid #1a1a1a' }}>
+            <button onClick={selectAll} disabled={allSelected}
+              style={{ flex: 1, background: 'none', border: 'none', padding: '8px', color: allSelected ? '#444' : '#4a9eff', fontSize: '0.74rem', cursor: allSelected ? 'default' : 'pointer' }}>
+              ✓ Выбрать все
+            </button>
+            <div style={{ width: 1, background: '#1a1a1a' }} />
+            <button onClick={clearAll} disabled={noneSelected}
+              style={{ flex: 1, background: 'none', border: 'none', padding: '8px', color: noneSelected ? '#444' : '#ff6b6b', fontSize: '0.74rem', cursor: noneSelected ? 'default' : 'pointer' }}>
+              ✕ Снять все
+            </button>
+          </div>
+
+          {/* Поиск */}
+          {searchable && (
+            <div style={{ padding: '6px 8px', borderBottom: '1px solid #1a1a1a' }}>
+              <input
+                value={q} onChange={e => setQ(e.target.value)} placeholder="Фильтр…" autoFocus
+                style={{ width: '100%', background: '#0a0a0a', border: '1px solid #1f1f1f', borderRadius: 5, padding: '5px 8px', color: '#fff', fontSize: '0.76rem', outline: 'none' }} />
+            </div>
+          )}
+
+          {/* Список */}
+          <div style={{ maxHeight: 260, overflowY: 'auto', padding: '4px 0' }}>
+            {filtered.length === 0 && (
+              <div style={{ padding: '10px 12px', color: '#444', fontSize: '0.74rem' }}>Ничего не найдено</div>
+            )}
+            {filtered.map(o => {
+              const checked = selected.has(o.value);
+              return (
+                <label key={o.value}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', cursor: 'pointer', fontSize: '0.78rem' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#161616')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                  <span style={{
+                    width: 14, height: 14, borderRadius: 3, flexShrink: 0,
+                    border: '1px solid', borderColor: checked ? '#4a9eff' : '#333',
+                    background: checked ? '#4a9eff' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff', fontSize: '0.7rem', lineHeight: 1,
+                  }}>{checked ? '✓' : ''}</span>
+                  <input type="checkbox" checked={checked} onChange={() => toggle(o.value)} style={{ display: 'none' }} />
+                  {o.color && <span style={{ width: 9, height: 9, borderRadius: '50%', background: o.color, flexShrink: 0 }} />}
+                  <span style={{ color: checked ? '#fff' : '#999', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.label}</span>
+                  {o.count != null && <span style={{ color: '#555', fontSize: '0.68rem', fontFamily: 'monospace' }}>{o.count}</span>}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Web Worker для физики ─────────────────────────────────────────────────
 // Inline через Blob — без bundling-настроек.
 // Алгоритм O(N²) с одной оптимизацией: пропуск дальних пар.
@@ -214,8 +393,12 @@ export default function GraphPage() {
 
   const [selected, setSelected]   = useState<Node | null>(null);
   const [search, setSearch]         = useState('');
-  const [filterSphere, setFilterSphere] = useState('');
-  const [filterTag, setFilterTag]       = useState('');
+  // Excel-подобные мультифильтры. null = ещё не инициализированы (= выбрано всё).
+  const [selSpheres, setSelSpheres] = useState<Set<string> | null>(null);
+  const [selTags, setSelTags]       = useState<Set<string> | null>(null);
+  // Диапазонные фильтры. null = ещё не инициализированы (ждём данные).
+  const [ageRange, setAgeRange]       = useState<[number, number] | null>(null);
+  const [weightRange, setWeightRange] = useState<[number, number] | null>(null);
 
   // Viewport: tx/ty/scale в ref — pan/zoom не вызывают ре-рендер всего графа
   const viewRef = useRef({ tx: 0, ty: 0, scale: 1 });
@@ -392,23 +575,104 @@ export default function GraphPage() {
 
   // ── Фильтрация ───────────────────────────────────────────────────────────
   const sq = search.toLowerCase();
-  const filteredIds = useMemo(() => {
-    if (!sq && !filterSphere && !filterTag) return null;
-    return new Set(nodes.filter(n =>
-      (!sq || n.label.toLowerCase().includes(sq)) &&
-      (!filterSphere || n.sphere === filterSphere) &&
-      (!filterTag    || (n.tags || []).includes(filterTag))
-    ).map(n => n.id));
-  }, [nodes, sq, filterSphere, filterTag]);
 
-  const isDim = (id: number) => filteredIds !== null && !filteredIds.has(id);
-
-  // ── Производные данные ───────────────────────────────────────────────────
+  // Все доступные сферы (в порядке HPI) и теги из данных
+  const allSpheres = useMemo(() => {
+    const present = new Set<string>();
+    for (const n of nodes) if (n.sphere) present.add(n.sphere);
+    const ordered = Object.keys(SPHERE_LABELS).filter(s => present.has(s));
+    // сферы, которых нет в словаре, но есть в данных
+    for (const s of present) if (!SPHERE_LABELS[s]) ordered.push(s);
+    return ordered;
+  }, [nodes]);
   const allTags = useMemo(() => {
     const set = new Set<string>();
     for (const n of nodes) (n.tags || []).forEach(t => set.add(t));
     return [...set].sort();
   }, [nodes]);
+
+  // Инициализируем выбор «всё включено», когда пришли узлы
+  useEffect(() => {
+    if (!nodes.length) return;
+    setSelSpheres(prev => prev ?? new Set(allSpheres));
+    setSelTags(prev => prev ?? new Set(allTags));
+  }, [nodes.length, allSpheres, allTags]);
+
+  // Границы диапазонов из данных
+  const ageBounds = useMemo<[number, number]>(() => {
+    const vals = nodes.map(n => n.age).filter((v): v is number => v != null);
+    return vals.length ? [Math.min(...vals), Math.max(...vals)] : [0, 100];
+  }, [nodes]);
+  const weightBounds = useMemo<[number, number]>(() => {
+    const vals = nodes.map(n => n.weight).filter((v): v is number => v != null);
+    return vals.length ? [Math.min(...vals), Math.max(...vals)] : [0, 1];
+  }, [nodes]);
+
+  // Инициализируем диапазоны под фактические границы, когда пришли узлы
+  useEffect(() => {
+    if (!nodes.length) return;
+    setAgeRange(prev => prev ?? ageBounds);
+    setWeightRange(prev => prev ?? weightBounds);
+  }, [nodes.length, ageBounds, weightBounds]);
+
+  const ageActive    = ageRange    && (ageRange[0]    > ageBounds[0]    || ageRange[1]    < ageBounds[1]);
+  const weightActive = weightRange && (weightRange[0] > weightBounds[0] || weightRange[1] < weightBounds[1]);
+
+  // Сфера активна как фильтр, если выбраны не все сферы
+  const sphereActive = selSpheres != null && selSpheres.size < allSpheres.length;
+  // Тег активен, если выбраны не все теги
+  const tagActive    = selTags != null && selTags.size < allTags.length;
+
+  const matchSphere = (n: Node) => {
+    if (!sphereActive) return true;
+    return n.sphere ? selSpheres!.has(n.sphere) : false;
+  };
+  const matchTags = (n: Node) => {
+    if (!tagActive) return true;
+    const tags = n.tags || [];
+    // узел проходит, если хотя бы один его тег выбран (логика ИЛИ, как в Excel)
+    return tags.some(t => selTags!.has(t));
+  };
+
+  const filteredIds = useMemo(() => {
+    if (!sq && !sphereActive && !tagActive && !ageActive && !weightActive) return null;
+    return new Set(nodes.filter(n =>
+      (!sq || n.label.toLowerCase().includes(sq)) &&
+      matchSphere(n) &&
+      matchTags(n) &&
+      (!ageActive    || (n.age != null && n.age >= ageRange![0] && n.age <= ageRange![1])) &&
+      (!weightActive || (n.weight != null && n.weight >= weightRange![0] && n.weight <= weightRange![1]))
+    ).map(n => n.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, sq, selSpheres, selTags, sphereActive, tagActive, ageActive, weightActive, ageRange, weightRange]);
+
+  const isDim = (id: number) => filteredIds !== null && !filteredIds.has(id);
+
+  // ── Производные данные ───────────────────────────────────────────────────
+  // Счётчики узлов по сфере / тегу (для отображения в мультиселекте)
+  const sphereCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const n of nodes) if (n.sphere) m[n.sphere] = (m[n.sphere] || 0) + 1;
+    return m;
+  }, [nodes]);
+  const tagCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const n of nodes) (n.tags || []).forEach(t => { m[t] = (m[t] || 0) + 1; });
+    return m;
+  }, [nodes]);
+
+  const sphereOptions: MultiOption[] = allSpheres.map(s => ({
+    value: s,
+    label: SPHERE_LABELS[s] ?? s,
+    color: getColor(s),
+    count: sphereCounts[s] ?? 0,
+  }));
+  const tagOptions: MultiOption[] = allTags.map(t => ({
+    value: t,
+    label: `#${t}`,
+    count: tagCounts[t] ?? 0,
+  }));
+
   const nodeMap = useMemo(() => new Map(nodes.map(n => [n.id, n])), [nodes]);
   const selectedEdges = selected ? edges.filter(e => e.source === selected.id || e.target === selected.id) : [];
 
@@ -467,6 +731,33 @@ export default function GraphPage() {
 
         /* Прогресс-бар сверху */
         @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.5 } }
+
+        /* Двухползунковый range-фильтр */
+        .range-dual { position: relative; height: 18px; }
+        .range-track {
+          position: absolute; top: 50%; left: 0; right: 0; height: 3px;
+          transform: translateY(-50%); background: #2a2a2a; border-radius: 2px;
+        }
+        .range-fill {
+          position: absolute; top: 50%; height: 3px;
+          transform: translateY(-50%); background: #4a9eff; border-radius: 2px;
+        }
+        .range-dual input[type="range"] {
+          position: absolute; top: 0; left: 0; width: 100%; height: 18px;
+          margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none;
+        }
+        .range-dual input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none; appearance: none;
+          width: 13px; height: 13px; border-radius: 50%;
+          background: #fff; border: 2px solid #4a9eff; cursor: pointer;
+          pointer-events: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        }
+        .range-dual input[type="range"]::-moz-range-thumb {
+          width: 13px; height: 13px; border-radius: 50%;
+          background: #fff; border: 2px solid #4a9eff; cursor: pointer;
+          pointer-events: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        }
+        .range-dual input[type="range"]::-moz-range-track { background: none; }
       `}</style>
 
       <svg
@@ -625,33 +916,68 @@ export default function GraphPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск…"
             style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fff', width: 130, fontSize: '0.85rem' }} />
         </div>
-        <select value={filterSphere} onChange={e => setFilterSphere(e.target.value)}
-          style={{ background: 'rgba(0,0,0,0.85)', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
-          <option value="">Все сферы</option>
-          {Object.entries(SPHERE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select value={filterTag} onChange={e => setFilterTag(e.target.value)}
-          style={{ background: 'rgba(0,0,0,0.85)', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
-          <option value="">Все теги</option>
-          {allTags.map(t => <option key={t} value={t}>#{t}</option>)}
-        </select>
+        <MultiSelect
+          title="Сферы"
+          options={sphereOptions}
+          selected={selSpheres ?? new Set(allSpheres)}
+          onChange={setSelSpheres}
+        />
+        <MultiSelect
+          title="Теги"
+          options={tagOptions}
+          selected={selTags ?? new Set(allTags)}
+          onChange={setSelTags}
+          searchable
+        />
+        {ageRange && ageBounds[0] !== ageBounds[1] && (
+          <RangeFilter
+            label="Возраст"
+            bounds={ageBounds}
+            value={ageRange}
+            step={1}
+            fmt={n => String(Math.round(n))}
+            onChange={setAgeRange}
+            onReset={() => setAgeRange([...ageBounds])}
+          />
+        )}
+        {weightRange && weightBounds[0] !== weightBounds[1] && (
+          <RangeFilter
+            label="Вес"
+            bounds={weightBounds}
+            value={weightRange}
+            step={0.1}
+            fmt={n => n.toFixed(1)}
+            onChange={setWeightRange}
+            onReset={() => setWeightRange([...weightBounds])}
+          />
+        )}
         <div style={{ background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: '7px 12px', color: '#555', fontSize: '0.78rem' }}>
           {stats.nodes_count} узлов · {stats.edges_count} связей
         </div>
       </div>
 
-      {/* Легенда — сферы HPI */}
+      {/* Легенда — сферы HPI (клик = вкл/выкл сферу в фильтре) */}
       <div style={{ position: 'absolute', bottom: 16, left: 12, background: 'rgba(0,0,0,0.85)', borderRadius: 8, padding: '10px 14px', zIndex: 10 }}>
-        {Object.entries(SPHERE_LABELS).map(([sphere, label]) => (
-          <div key={sphere} onClick={() => setFilterSphere(p => p === sphere ? '' : sphere)}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginBottom: 4 }}>
-            <div style={{ width: 9, height: 9, borderRadius: '50%', background: SPHERE_COLORS[sphere], flexShrink: 0,
-              boxShadow: filterSphere === sphere ? `0 0 6px ${SPHERE_COLORS[sphere]}` : 'none' }} />
-            <span style={{ color: filterSphere === sphere ? '#fff' : '#777', fontSize: '0.76rem' }}>{label}</span>
-          </div>
-        ))}
+        {allSpheres.map(sphere => {
+          const label = SPHERE_LABELS[sphere] ?? sphere;
+          const on = selSpheres ? selSpheres.has(sphere) : true;
+          // подсвечиваем состояние только когда фильтр по сферам активен
+          const highlight = sphereActive ? on : false;
+          const dimmed    = sphereActive && !on;
+          return (
+            <div key={sphere}
+              onClick={() => {
+                const base = new Set(selSpheres ?? new Set(allSpheres));
+                base.has(sphere) ? base.delete(sphere) : base.add(sphere);
+                setSelSpheres(base);
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginBottom: 4, opacity: dimmed ? 0.4 : 1 }}>
+              <div style={{ width: 9, height: 9, borderRadius: '50%', background: SPHERE_COLORS[sphere], flexShrink: 0,
+                boxShadow: highlight ? `0 0 6px ${SPHERE_COLORS[sphere]}` : 'none' }} />
+              <span style={{ color: highlight ? '#fff' : dimmed ? '#555' : '#999', fontSize: '0.76rem', textDecoration: dimmed ? 'line-through' : 'none' }}>{label}</span>
+            </div>
+          );
+        })}
       </div>
 
       {/* Контролы масштаба */}
@@ -707,21 +1033,24 @@ export default function GraphPage() {
             <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', color: '#444', fontSize: '1.3rem', cursor: 'pointer', marginLeft: 8 }}>×</button>
           </div>
 
-          {/* Теги */}
+          {/* Теги (клик = изолировать тег; повторный клик = сбросить) */}
           {selected.tags && selected.tags.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
-              {selected.tags.map(t => (
+              {selected.tags.map(t => {
+                const isolated = tagActive && selTags!.size === 1 && selTags!.has(t);
+                return (
                 <span key={t}
-                  onClick={() => setFilterTag(prev => prev === t ? '' : t)}
+                  onClick={() => setSelTags(isolated ? new Set(allTags) : new Set([t]))}
                   style={{
                     fontSize: '0.68rem',
                     padding: '2px 7px',
                     borderRadius: 3,
-                    background: filterTag === t ? '#fff' : '#1a1a1a',
-                    color: filterTag === t ? '#000' : '#888',
+                    background: isolated ? '#fff' : '#1a1a1a',
+                    color: isolated ? '#000' : '#888',
                     cursor: 'pointer',
                   }}>#{t}</span>
-              ))}
+                );
+              })}
             </div>
           )}
 
