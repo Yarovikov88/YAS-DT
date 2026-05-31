@@ -1,127 +1,125 @@
-# YAS-DT: Digital Twin Core
+# YAS-DT — Digital Twin
 
-## Архитектура v2.0 - Семантический граф знаний
+Семантический граф знаний (цифровой двойник): личная база фактов, связанных типизированными
+рёбрами, с интерактивной визуализацией. Next.js 14 + Supabase (PostgreSQL).
 
-Система управления личными знаниями на основе типизированного графа с поддержкой семантических связей.
+> Документация проекта держится в трёх файлах: **README.md** (что это и как запустить, вы здесь),
+> **CHANGELOG.md** (история по версиям), **conception.md** (философия и модель данных).
+> Активные задачи и дизайн фич ведутся в спеках — `.kiro/specs/`.
 
-### Ключевые улучшения v2.0
+## Что это
 
-**Было (v1.0 - Плоский монолит):**
-- ❌ Связи хранятся как плоский массив чисел `relations: number[]`
-- ❌ Все данные в одной таблице `facts`
-- ❌ Нет типизации связей
-- ❌ Невозможно понять природу связи между фактами
+- **Узлы** — факты (события, принципы, кейсы), хранятся в таблице `facts`.
+- **Рёбра** — типизированные связи между фактами (`fact_relations`), 10 семантических типов.
+- **Таксономия** — каждый факт привязан к одной из 8 **сфер HPI** + набору свободных **тегов**
+  из контролируемых словарей (тип / контекст / этап).
+- **Визуализация** — интерактивный SVG-граф с физикой в Web Worker, фильтрами и поиском.
 
-**Стало (v2.0 - Семантический граф):**
-- ✅ Нормализованная схема БД с отдельными таблицами
-- ✅ Типизированные связи с 10 типами отношений
-- ✅ Таблица `fact_relations` для рёбер графа
-- ✅ Метаданные: категории, секции, веса связей
-- ✅ Индексы для быстрых графовых запросов
+### 8 сфер HPI
 
-### Структура проекта
+`loved` · `family` · `friends` · `career` · `physical` · `mental` · `hobby` · `wealth`
+
+### Типы связей
+
+`causes` · `influences` · `contradicts` · `supports` · `derives_from` · `applies_to`
+· `similar_to` · `part_of` · `prerequisite_for` · `related_to`
+
+## Стек
+
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript (strict)
+- **Backend**: Next.js API Routes, Supabase (PostgreSQL)
+- **Визуализация**: SVG + force-directed раскладка в Web Worker
+- **AI**: Gemini API (классификация фактов по сферам/тегам)
+
+## Структура
 
 ```
 YAS-DT/
-├── data/
-│   ├── yas_core.json          # Legacy данные v1.0
-│   └── yas_core_v2.6.json     # Актуальные данные
+├── app/
+│   ├── api/
+│   │   ├── facts/route.ts   # GET /api/facts — факты с фильтрами
+│   │   └── graph/route.ts   # GET /api/graph — { nodes, edges, stats }
+│   ├── graph/page.tsx       # /graph — визуализация графа
+│   ├── layout.tsx
+│   └── page.tsx             # главная
 ├── scripts/
-│   ├── migrate.ts             # Старая миграция (v1.0)
-│   ├── migrate-v2.ts          # Новая миграция (v2.0) ⭐
-│   └── schema.sql             # SQL-схема для Supabase ⭐
-├── types/
-│   └── index.ts               # TypeScript типы с поддержкой графа ⭐
-└── legacy/
-    ├── brain.py               # Python CLI (устарело)
-    └── editor.html            # HTML редактор (устарело)
+│   ├── schema.sql           # базовая схема (facts, fact_relations, ...)
+│   ├── add-spheres-tags.sql # патч: sphere + tags
+│   ├── migrate-v2.ts        # миграция данных в Supabase
+│   └── classify-facts.ts    # авто-классификация через Gemini API
+├── types/index.ts           # TypeScript типы графа
+├── data/                    # исходные данные (yas_core_v2.6.json)
+└── .kiro/specs/             # спеки фич (requirements / design / tasks)
 ```
 
-### Типы связей в графе
+## Быстрый старт
 
-```typescript
-type RelationType = 
-  | 'causes'           // причинно-следственная связь
-  | 'influences'       // влияние
-  | 'contradicts'      // противоречие
-  | 'supports'         // поддержка
-  | 'derives_from'     // происходит из
-  | 'applies_to'       // применяется к
-  | 'similar_to'       // похоже на
-  | 'part_of'          // часть чего-то
-  | 'prerequisite_for' // предусловие для
-  | 'related_to';      // общая связь
-```
-
-### Быстрый старт
-
-#### 1. Установка зависимостей
+### 1. Зависимости
 
 ```bash
 npm install
 ```
 
-#### 2. Настройка окружения
+### 2. Переменные окружения
 
-Создайте файл `.env.local`:
+Создайте `.env.local` в корне проекта:
 
 ```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_URL=https://<project-id>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+GEMINI_API_KEY=<gemini-api-key>   # нужен только для classify-facts
 ```
 
-#### 3. Применение SQL-схемы
+Credentials берутся в Supabase Dashboard → **Settings → API**.
+`.env.local` в `.gitignore` — не коммитьте секреты.
 
-Откройте Supabase Dashboard → SQL Editor и выполните:
+### 3. Схема БД
 
-```bash
-cat scripts/schema.sql
-```
+Откройте Supabase Dashboard → **SQL Editor** и выполните по очереди:
 
-Или через CLI:
+1. `scripts/schema.sql` — таблицы `facts`, `fact_relations` и индексы
+2. `scripts/add-spheres-tags.sql` — колонки `sphere` и `tags`
 
-```bash
-supabase db push
-```
-
-#### 4. Запуск миграции v2.0
+### 4. Миграция данных
 
 ```bash
 npm run db:migrate:v2
 ```
 
-### Что делает миграция v2.0
+### 5. Запуск
 
-1. **Дедупликация** - удаляет настоящие дубликаты по названию
-2. **Разрешение коллизий ID** - переназначает ID при конфликтах
-3. **Извлечение метаданных** - создаёт таблицы категорий и секций
-4. **Построение графа** - преобразует плоские `relations: number[]` в типизированные связи
-5. **Загрузка данных** - атомарно загружает всё в Supabase
+```bash
+npm run dev
+```
 
-### Статистика данных
+Откройте http://localhost:3000 — главная, и http://localhost:3000/graph — граф знаний.
 
-- **Фактов**: 163+ узлов графа
-- **Секций**: 8 (Генезис, Военная академия, Рост, Семья, Продукты, Коммуникация, Психофизика, Расширение)
-- **Категорий**: Военный, Технология, Психофизика, Юридический, Личное, Кейс, Принцип
-- **Связей**: Автоматически извлекаются из legacy-формата
+## npm-скрипты
 
-### Следующие шаги
+```bash
+npm run dev            # dev-сервер (localhost:3000)
+npm run build          # production build
+npm run start          # production сервер
+npm run lint           # ESLint
+npm run db:migrate:v2  # миграция данных в Supabase
+npm run db:classify    # классификация фактов по сферам/тегам через Gemini
+```
 
-- [ ] Создать Next.js приложение для визуализации графа
-- [ ] Добавить API для работы с графом
-- [ ] Реализовать force-directed layout для отображения
-- [ ] Интегрировать Gemini API для автоматического извлечения связей
-- [ ] Добавить поиск по графу и рекомендации
+## API
 
-### Технологии
+| Эндпоинт | Описание |
+|----------|----------|
+| `GET /api/facts` | Факты с фильтрами (`?category=`, `?section=`, `?id=`, `?limit=`) |
+| `GET /api/graph` | Полный граф: `{ nodes, edges, stats }` |
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Backend**: Supabase (PostgreSQL), Next.js API Routes
-- **AI**: Gemini 1.5 Pro (планируется)
-- **Viz**: Canvas-based force-directed graph (планируется)
+## Возможности графа
+
+- Force-directed раскладка, цвета узлов по сферам HPI, размер по весу
+- Excel-подобные мультифильтры по сферам и тегам (выбор нескольких, «выбрать/снять все», счётчики)
+- Диапазонные фильтры по возрасту и весу
+- Поиск, pan/zoom, fit-to-screen
+- Панель деталей: markdown-контент факта, кликабельные теги, навигация по связям
 
 ---
 
-**Архитектор**: Андрей Яровиков (YAS)  
-**Версия**: 2.0.0  
-**Дата**: 2024
+**Архитектор**: Андрей Яровиков (YAS) · текущая версия — см. `package.json` и `CHANGELOG.md`
